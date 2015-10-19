@@ -1,27 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
 	public float m_speed;
 
 	private Vector3 m_direction;
 	private Rigidbody2D m_rigidbody;
 
+    public void SetDirection(Vector3 direction)
+    {
+        m_direction = direction;
+    }
+
 	private void Awake()
 	{
 		m_rigidbody = GetComponent<Rigidbody2D>();
-        m_direction = Vector3.right;
 	}
 
 	private void FixedUpdate()
 	{
-		m_rigidbody.velocity = m_direction * m_speed * Time.fixedDeltaTime;
+        if(isServer)
+        {
+            m_rigidbody.velocity = m_direction * m_speed * Time.fixedDeltaTime;
+        }
 	}
 
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
-        Destroy(gameObject);
+        if(isServer)
+        {
+            Destroy(gameObject);
+        }
 	}
 }

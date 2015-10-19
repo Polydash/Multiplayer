@@ -7,11 +7,13 @@ public class PlayerNetwork : NetworkBehaviour
 	public GameObject m_bulletPrefab;
 
     [Command]
-    public void CmdShootBullet()
+    public void CmdShootBullet(Vector2 aimDirection)
     {
-        GameObject bulletRef = Instantiate(m_bulletPrefab, transform.position, Quaternion.identity) as GameObject;
+        Vector3 position = transform.position + new Vector3(aimDirection.x, aimDirection.y, 0.0f) * 0.5f;
+        GameObject bulletRef = Instantiate(m_bulletPrefab, position, Quaternion.identity) as GameObject;
         NetworkServer.Spawn(bulletRef);
         Destroy(bulletRef, 2.0f);
+        bulletRef.GetComponent<Bullet>().SetDirection(aimDirection);
     }
 
 	private void Start()

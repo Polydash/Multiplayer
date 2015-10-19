@@ -10,7 +10,9 @@ public class PlayerControl : MonoBehaviour
 
     private Rigidbody2D m_rigidbody;
     private Vector2 m_moveDirection;
+    private Vector2 m_aimDirection;
     private PlayerActions m_playerActions;
+    private PlayerNetwork m_playerNetwork;
     private float m_lastShoot;
 
     private void OnEnable()
@@ -26,18 +28,31 @@ public class PlayerControl : MonoBehaviour
     private void Awake()
     {
         m_rigidbody = GetComponent<Rigidbody2D>();
+        m_playerNetwork = GetComponent<PlayerNetwork>();
+        m_aimDirection = Vector2.right;
     }
 
     private void Update()
     {
         m_moveDirection = m_playerActions.Move.Value;
-        float shootElapsed = Time.time - m_lastShoot;
+        
+        if(m_playerActions.Aim.Value.SqrMagnitude() > 0.3f)
+        {
+            m_aimDirection = m_playerActions.Aim.Value;
+            m_aimDirection.Normalize();
+        }
 
+        float shootElapsed = Time.time - m_lastShoot;
 		if(m_playerActions.Shoot.IsPressed && shootElapsed > m_shootInterval)
 		{
-            GetComponent<PlayerNetwork>().CmdShootBullet();
+            m_playerNetwork.CmdShootBullet(m_aimDirection);
             m_lastShoot = Time.time;
 		}
+
+        float angle = Mathf.Acos(Vector2.Dot(Vector2.right, m_aimDirection)) / (2.0f*Mathf.PI) * 360.0f;
+        float sign = Vector2.Dot(Vector2.up, m_aimDirection);
+        sign = (sign > 0) ? 1 : -1;
+        m_rigidbody.rotation = sign * angle;
     }
 
     private void FixedUpdate()
