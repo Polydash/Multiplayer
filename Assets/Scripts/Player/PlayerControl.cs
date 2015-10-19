@@ -6,16 +6,12 @@ using InControl;
 public class PlayerControl : MonoBehaviour
 {
     public float m_speed;
+    public float m_shootInterval;
 
     private Rigidbody2D m_rigidbody;
     private Vector2 m_moveDirection;
     private PlayerActions m_playerActions;
-	private GameObject m_bulletRef;
-
-	public void SetBulletRef(GameObject bulletRef)
-	{
-		m_bulletRef = bulletRef;
-	}
+    private float m_lastShoot;
 
     private void OnEnable()
     {
@@ -35,10 +31,12 @@ public class PlayerControl : MonoBehaviour
     private void Update()
     {
         m_moveDirection = m_playerActions.Move.Value;
+        float shootElapsed = Time.time - m_lastShoot;
 
-		if(m_playerActions.Shoot.IsPressed)
+		if(m_playerActions.Shoot.IsPressed && shootElapsed > m_shootInterval)
 		{
-			TryShoot();
+            GetComponent<PlayerNetwork>().CmdShootBullet();
+            m_lastShoot = Time.time;
 		}
     }
 
@@ -46,14 +44,4 @@ public class PlayerControl : MonoBehaviour
     {
         m_rigidbody.velocity = m_moveDirection * m_speed * Time.fixedDeltaTime;
     }
-
-	private void TryShoot()
-	{
-		if(!m_bulletRef.activeInHierarchy)
-		{
-			m_bulletRef.SetActive(true);
-			m_bulletRef.GetComponent<Bullet>().Reset(transform.position);
-		}
-	}
-
 }

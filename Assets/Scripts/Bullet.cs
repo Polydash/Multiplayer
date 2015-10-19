@@ -9,15 +9,10 @@ public class Bullet : MonoBehaviour
 	private Vector3 m_direction;
 	private Rigidbody2D m_rigidbody;
 
-	public void Reset(Vector3 spawnPosition)
-	{
-		transform.position = spawnPosition;
-		m_direction = Vector3.right;
-	}
-
 	private void Awake()
 	{
 		m_rigidbody = GetComponent<Rigidbody2D>();
+        m_direction = Vector3.right;
 	}
 
 	private void FixedUpdate()
@@ -27,7 +22,6 @@ public class Bullet : MonoBehaviour
 
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
-		Debug.Log("Bullet Collision");
-		gameObject.SetActive(false);
+        Destroy(gameObject);
 	}
 }
