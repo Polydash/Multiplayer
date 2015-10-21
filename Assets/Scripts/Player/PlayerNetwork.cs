@@ -11,9 +11,10 @@ public class PlayerNetwork : NetworkBehaviour
     {
         Vector3 position = transform.position + new Vector3(aimDirection.x, aimDirection.y, 0.0f) * 0.5f;
         GameObject bulletRef = Instantiate(m_bulletPrefab, position, Quaternion.identity) as GameObject;
+        bulletRef.GetComponent<Rigidbody2D>().velocity = aimDirection * Time.deltaTime * 350.0f;
         NetworkServer.Spawn(bulletRef);
         Destroy(bulletRef, 2.0f);
-        bulletRef.GetComponent<Bullet>().SetDirection(aimDirection);
+        //bulletRef.GetComponent<Bullet>().SetDirection();
     }
 
 	private void Start()
