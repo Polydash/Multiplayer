@@ -14,6 +14,12 @@ public class PlayerControl : MonoBehaviour
     private PlayerActions m_playerActions;
     private PlayerNetwork m_playerNetwork;
     private float m_lastShoot;
+    private Bullet m_bullet;
+
+    public void SetBulletRef(Bullet bulletRef)
+    {
+        m_bullet = bulletRef;
+    }
 
     private void OnEnable()
     {
@@ -32,6 +38,11 @@ public class PlayerControl : MonoBehaviour
         m_aimDirection = Vector2.right;
     }
 
+    private void Start()
+    {
+        m_playerNetwork.CmdInstantiateBullet();
+    }
+
     private void Update()
     {
         m_moveDirection = m_playerActions.Move.Value;
@@ -45,14 +56,15 @@ public class PlayerControl : MonoBehaviour
         float shootElapsed = Time.time - m_lastShoot;
 		if(m_playerActions.Shoot.IsPressed && shootElapsed > m_shootInterval)
 		{
-            m_playerNetwork.CmdShootBullet(m_aimDirection);
+            //m_playerNetwork.CmdShootBullet(m_aimDirection);
+            m_bullet.Shoot(transform.position, m_aimDirection);
             m_lastShoot = Time.time;
 		}
 
         float angle = Mathf.Acos(Vector2.Dot(Vector2.right, m_aimDirection)) / (2.0f*Mathf.PI) * 360.0f;
         float sign = Vector2.Dot(Vector2.up, m_aimDirection);
         sign = (sign > 0) ? 1 : -1;
-        m_rigidbody.rotation = sign * angle;
+        m_rigidbody.MoveRotation(sign * angle);
     }
 
     private void FixedUpdate()
